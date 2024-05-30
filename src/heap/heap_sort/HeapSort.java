@@ -4,17 +4,17 @@ public abstract class HeapSort<E extends Comparable<? super E>> {
 
     public void sort(E[] arr) {
         int n = arr.length;
-        // Build heap (rearrange array)
+        // Build src.heap (rearrange array)
         for (int i = n / 2 - 1; i >= 0; i--) {
             heapify(arr, n, i);
         }
-        // One by one extract an element from heap
+        // One by one extract an element from src.heap
         for (int i = n-1; i >= 0; i--) {
             // Move current root to end
             E temp = arr[0];
             arr[0] = arr[i];
             arr[i] = temp;
-            // call max heapify on the reduced heap
+            // call max heapify on the reduced src.heap
             heapify(arr, i, 0);
         }
     }
