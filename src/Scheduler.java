@@ -80,7 +80,8 @@ public class Scheduler {
 
     public static void main(String args[]) {
         Scheduler scheduler = new Scheduler();
-        String [] filenames = {"data/tasksetA.txt", "data/tasksetB.txt", "data/tasksetC.txt", "data/tasksetD.txt", "data/tasksetE.txt"};
+        String [] filenames = {"data/fall_2023_config.yml", "data/spring_2024_config.yml", "data/summer_2024_config.yml"};
+
         try {
             for (String filename : filenames) {
                 List<Task> tasks1 = new ArrayList<>();    // elements are Task1
