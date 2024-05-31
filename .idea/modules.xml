@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GameScheduler.iml" filepath="$PROJECT_DIR$/GameScheduler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ReadYaml.iml" filepath="$PROJECT_DIR$/ReadYaml.iml" />
     </modules>
   </component>
 </project>
