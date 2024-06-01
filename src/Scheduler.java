@@ -16,11 +16,9 @@ public class Scheduler {
         try {
             // Create a YAML object
             Yaml yaml = new Yaml();
-
             // Load YAML file into a Map
             FileInputStream inputStream = new FileInputStream(yamlFile);
             return yaml.load(inputStream);
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -74,7 +72,29 @@ public class Scheduler {
         iceTimes.sort(Comparator.comparing(iceTime -> iceTime.dateTime));
         List<Game> games = new ArrayList<>();
 
-        // TODO Implement the logic to generate games
+        List<LeftistHeap<Team>> leagueHeaps = new ArrayList<>();
+        for (League league : leagues) {
+            LeftistHeap<Team> heap = new MinLeftistHeap<>();
+            for (Team team : league.teams) {
+                heap.insert(team);
+            }
+            leagueHeaps.add(heap);
+        }
+
+        for (IceTime iceTime : iceTimes) {
+            for (LeftistHeap<Team> heap : leagueHeaps) {
+                Team team1 = heap.delete();
+                Team team2 = heap.delete();
+                if (team1 != null && team2 != null) {
+                    Game game = new Game(team1, team2, iceTime);
+                    games.add(game);
+
+                    // TODO update the heap with the teams
+
+                }
+            }
+
+        }
 
         return games;
     }

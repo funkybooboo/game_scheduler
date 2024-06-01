@@ -18,10 +18,10 @@ public class IceTime implements Comparable<IceTime>{
         this.time = parts[1];
         int hour = Integer.parseInt(this.time.split(":")[0]);
         int minute = Integer.parseInt(this.time.split(":")[1]);
-        this.isEarly = isEarlyGame(hour, minute);
+        this.isEarly = isEarly(hour, minute);
     }
 
-    private boolean isEarlyGame(int hour, int minute) {
+    private boolean isEarly(int hour, int minute) {
         if (hour < 20) {
             return true;
         }
