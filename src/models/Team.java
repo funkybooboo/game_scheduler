@@ -1,3 +1,5 @@
+package models;
+
 import java.util.Map;
 
 public class Team implements Comparable<Team> {
@@ -25,6 +27,7 @@ public class Team implements Comparable<Team> {
     }
 
     public int compareTo(Team other) {
+        // TODO make sure the team plays all other teams before playing the same team again
         // Compare based on the number of games
         int compareByGames = Integer.compare(this.numberOfGames, other.numberOfGames);
         if (compareByGames != 0) {
