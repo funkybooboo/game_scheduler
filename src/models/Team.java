@@ -33,9 +33,14 @@ public class Team implements Comparable<Team> {
         if (!this.league.equals(other.league)) {
             throw new IllegalArgumentException("Teams must be in the same league to compare.");
         }
-        // Max distance between playing the same team (5 games).
+
         // A team should have at least 3 days break before they play again.
+
+
+        // Max distance between playing the same team (5 games).
+
         // A team isn't allowed to play the same opponent again until they've played all other teams in the league.
+
         // A team should have an equal number of early and late games.
 
 
