@@ -29,9 +29,8 @@ public class Main {
         if (leagues instanceof List<?> leagueObjects) {
             for (Object leagueObj : leagueObjects) {
                 if (leagueObj instanceof Map<?, ?> leagueMap) {
-                    String leagueName = (String) leagueMap.get("name");
-                    List<Team> teams = getTeams(leagueMap.get("teams"), leagueName);
-                    League league = new League(leagueName, teams);
+                    List<Team> teams = getTeams(leagueMap.get("teams"));
+                    League league = new League(teams);
                     leagueList.add(league);
                 }
             }
@@ -39,14 +38,14 @@ public class Main {
         return leagueList;
     }
 
-    public static List<Team> getTeams(Object teams, String leagueName) {
+    public static List<Team> getTeams(Object teams) {
         List<Team> teamList = new ArrayList<>();
         if (teams instanceof List<?> teamObjects) {
             for (Object teamObj : teamObjects) {
                 if (teamObj instanceof Map<?, ?> teamMap) {
                     int teamId = (int) teamMap.get("id");
                     String teamName = (String) teamMap.get("name");
-                    Team team = new Team(teamId, teamName, leagueName);
+                    Team team = new Team(teamId, teamName);
                     teamList.add(team);
                 }
             }
@@ -68,11 +67,10 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        // "data/spring_2024_config.yml", "data/summer_2024_config.yml"
-        String [] filenames = {"data/fall_2023_config.yml"};
+        //
+        String [] filenames = {"data/fall_2023_config.yml", "data/spring_2024_config.yml", "data/summer_2024_config.yml"};
         for (String filename : filenames) {
             System.out.println("Priority "+ filename);
-            System.out.println();
             Map<String, Object> yamlMap = readYamlFile(filename);
             List<League> leagues = getLeagues(yamlMap.get("leagues"));
             List<IceTime> iceTimes = getIceTimes(yamlMap.get("ice_times"));
@@ -82,6 +80,7 @@ public class Main {
             for (Game game : games) {
                 System.out.println(game);
             }
+            System.out.println();
         }
     }
 }

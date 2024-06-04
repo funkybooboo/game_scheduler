@@ -53,8 +53,7 @@ leagues:
         id: 8235947
       - name: Trashers
         id: 8235948
-
-ice_time:
+ice_times:
   - 09/25/23 21:00
   - 09/25/23 22:30
   - 09/26/23 21:45

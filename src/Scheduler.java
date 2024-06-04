@@ -2,12 +2,12 @@ import heap.leftist_heap.LeftistHeap;
 import heap.leftist_heap.MinLeftistHeap;
 import models.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class Scheduler {
 
     private static final int MAX_NUMBER_OF_MATCHES = 2;
+    private static final int MAX_NUMBER_OF_GAMES = 10;
     private final  List<League> leagues;
     private final List<IceTime> iceTimes;
     Map<LeftistHeap<Match>, List<Match>> heapToMatches;
@@ -19,49 +19,54 @@ public class Scheduler {
     }
 
     public List<Game> schedule() {
-        List<LeftistHeap<Match>> leagueHeaps = new ArrayList<>();
+        List<LeftistHeap<MatchGroup>> leagueHeaps = new ArrayList<>();
         heapToMatches = new HashMap<>();
         for (League league : leagues) {
             List<Match> matches = new ArrayList<>();
-            LeftistHeap<Match> matchHeap = new MinLeftistHeap<>();
+            LeftistHeap<MatchGroup> matchGroupHeap = new MinLeftistHeap<>();
             for (int i = 0; i < league.teams.size(); i++) {
+                LeftistHeap<Match> matchHeap = new MinLeftistHeap<>();
                 for (int j = 0; j < league.teams.size(); j++) {
                     if (i != j) {
-                        Match match = new Match(league.teams.get(i), league.teams.get(j));
+                        Match match = new Match(league.teams.get(i), league.teams.get(j), iceTimes.getFirst());
                         matchHeap.insert(match);
                         matches.add(match);
                     }
                 }
+                heapToMatches.put(matchHeap, matches);
+                matchGroupHeap.insert(new MatchGroup(league.teams.get(i), matchHeap));
             }
-            heapToMatches.put(matchHeap, matches);
-            leagueHeaps.add(matchHeap);
+            leagueHeaps.add(matchGroupHeap);
         }
         return makeGames(leagueHeaps);
     }
 
-    private List<Game> makeGames(List<LeftistHeap<Match>> leagueHeaps) {
+    private List<Game> makeGames(List<LeftistHeap<MatchGroup>> leagueHeaps) {
         List<Game> games = new ArrayList<>();
-        LocalDateTime lastDay = iceTimes.getLast().dateTime;
-        Queue<IceTime> iceTimeQueue = new LinkedList<>(iceTimes);
+        IceTime lastIceTime = null;
+        for (IceTime iceTime : iceTimes) {
+            LeftistHeap<MatchGroup> heap = leagueHeaps.get(games.size() % leagues.size());
+            MatchGroup matchGroup = heap.peek();
+            int daysSinceLastGame = 0;
+            if (lastIceTime != null) {
+                daysSinceLastGame = iceTime.dateTime.getDayOfYear() - lastIceTime.dateTime.getDayOfYear();
+            }
+            heap.delete();
+            LeftistHeap<Match> matchHeap = matchGroup.matchHeap;
+            matchGroup.numberOfScheduledGames++;
+            games.add(makeGame(iceTime, matchHeap));
+            if (matchGroup.numberOfScheduledGames < MAX_NUMBER_OF_GAMES) {
+                heap.insert(matchGroup);
+            }
 
-        for (LocalDateTime currentDay = iceTimes.getFirst().dateTime; currentDay.isBefore(lastDay); currentDay.plusDays(1)) {
-            if (iceTimeQueue.isEmpty()) {
-                throw new IllegalArgumentException("Not enough ice times for all games.");
+            List<Match> matches = heapToMatches.get(matchGroup.matchHeap);
+            for (Match match : matches) {
+                match.numberOfDaysSinceLastGame += daysSinceLastGame;
+                match.team1.numberOfDaysSinceLastGame += daysSinceLastGame;
+                match.team2.numberOfDaysSinceLastGame += daysSinceLastGame;
             }
-            IceTime iceTime = iceTimeQueue.peek();
-            LeftistHeap<Match> heap = leagueHeaps.get(games.size() % leagues.size());
-            if (iceTime.dateTime.equals(currentDay)) {
-                iceTimeQueue.poll();
-                games.add(makeGame(iceTime, heap));
-            }
-            else {
-                List<Match> matches = heapToMatches.get(heap);
-                for (Match match : matches) {
-                    match.numberOfDaysSinceLastGame++;
-                    match.team1.numberOfDaysSinceLastGame++;
-                    match.team2.numberOfDaysSinceLastGame++;
-                }
-            }
+
+            lastIceTime = iceTime;
         }
         return games;
     }
@@ -109,6 +114,8 @@ public class Scheduler {
         if (match.numberOfScheduledGames < MAX_NUMBER_OF_MATCHES) {
             heap.insert(match);
         }
+
+        System.out.println(game);
 
         return game;
     }

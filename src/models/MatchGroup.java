@@ -7,6 +7,8 @@ public class MatchGroup implements Comparable<MatchGroup> {
     // Heap matches between this team and the other team
     public LeftistHeap<Match> matchHeap;
 
+    public int numberOfScheduledGames;
+
     public MatchGroup(Team team, LeftistHeap<Match> matchHeap) {
         this.team = team;
         this.matchHeap = matchHeap;
@@ -20,7 +22,8 @@ public class MatchGroup implements Comparable<MatchGroup> {
     }
 
     @Override
-    public int compareTo(MatchGroup o) {
-        return 0;
+    public int compareTo(MatchGroup other) {
+        // A team isn't allowed to play the same opponent again until they've played all other teams in the league.
+        return this.numberOfScheduledGames - other.numberOfScheduledGames;
     }
 }

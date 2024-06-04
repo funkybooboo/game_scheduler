@@ -55,8 +55,7 @@ leagues:
         id: 8386976
       - name: Redshift
         id: 8386982
-
-ice_time:
+ice_times:
   - 01/22/24 21:00
   - 01/22/24 22:30
   - 01/23/24 21:45

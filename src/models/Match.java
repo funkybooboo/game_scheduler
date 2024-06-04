@@ -11,12 +11,10 @@ public class Match implements Comparable<Match> {
 
     public IceTime nextIceTime;
 
-    public Match(Team team1, Team team2) {
-        if (!team1.league.equals(team2.league)) {
-            throw new IllegalArgumentException("Teams must be in the same league to compare.");
-        }
+    public Match(Team team1, Team team2, IceTime nextIceTime) {
         this.team1 = team1;
         this.team2 = team2;
+        this.nextIceTime = nextIceTime;
     }
 
     public String toString() {
@@ -28,14 +26,8 @@ public class Match implements Comparable<Match> {
 
     @Override
     public int compareTo(Match other) {
-        // - 1 if this is greater, 0 if equal, -1 if less
-        // - 1 means this should be scheduled before other
-        // - -1 means this should be scheduled after other
-        // - 0 means they can be scheduled in any order
-
         // A team should have at least 3 days break before they play again.
         // Max distance between playing the same team (5 games).
-        // A team isn't allowed to play the same opponent again until they've played all other teams in the league.
         // A team should have an equal number of early and late games.
 
         boolean thisHasBreakRule = this.team1.numberOfDaysSinceLastGame >= 3 && this.team2.numberOfDaysSinceLastGame >= 3;
@@ -44,6 +36,46 @@ public class Match implements Comparable<Match> {
         boolean thisHasMaxDistanceRule = this.numberOfScheduledGames <= 5;
         boolean otherHasMaxDistanceRule = other.numberOfScheduledGames <= 5;
 
-        return 0;
+        boolean thisCouldUseMoreEarlyGames = this.numberOfEarlyGames < this.numberOfLateGames;
+        boolean otherCouldUseMoreEarlyGames = other.numberOfEarlyGames < other.numberOfLateGames;
+
+        boolean thisCouldUseNextIceTime = this.nextIceTime.isEarly && thisCouldUseMoreEarlyGames;
+        boolean otherCouldUseNextIceTime = other.nextIceTime.isEarly && otherCouldUseMoreEarlyGames;
+
+        if (thisHasBreakRule && otherHasBreakRule) {
+            if (thisHasMaxDistanceRule && otherHasMaxDistanceRule) {
+                if (thisCouldUseNextIceTime && otherCouldUseNextIceTime) {
+                    return 0;
+                }
+                else if (thisCouldUseNextIceTime) {
+                    return -1;
+                }
+                else if (otherCouldUseNextIceTime) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            }
+            else if (thisHasMaxDistanceRule) {
+                return -1;
+            }
+            else if (otherHasMaxDistanceRule) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+        else if (thisHasBreakRule) {
+            return -1;
+        }
+        else if (otherHasBreakRule) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
+
 }
