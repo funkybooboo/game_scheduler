@@ -73,30 +73,59 @@ public class Scheduler {
         List<Game> games = new ArrayList<>();
 
         List<LeftistHeap<Team>> leagueHeaps = new ArrayList<>();
+        Map<LeftistHeap<Team>, League> heapLeagueMap = new HashMap<>();
         for (League league : leagues) {
             LeftistHeap<Team> heap = new MinLeftistHeap<>();
+            heapLeagueMap.put(heap, league);
             for (Team team : league.teams) {
                 heap.insert(team);
             }
             leagueHeaps.add(heap);
         }
-
-        for (IceTime iceTime : iceTimes) {
-            for (LeftistHeap<Team> heap : leagueHeaps) {
-                Team team1 = heap.delete();
-                Team team2 = heap.delete();
-                if (team1 != null && team2 != null) {
-                    Game game = new Game(team1, team2, iceTime);
-                    games.add(game);
-
-                    // TODO update the heap with the teams
-
-                }
-            }
-
+        for (int i = 0; i < iceTimes.size(); i++) {
+            makeGame(iceTimes.get(i), leagueHeaps.get(i % leagues.size()), games, heapLeagueMap);
         }
 
         return games;
+    }
+
+    private static void makeGame(IceTime iceTime, LeftistHeap<Team> heap, List<Game> games, Map<LeftistHeap<Team>, League> heapLeagueMap) {
+        Team team1 = heap.delete();
+        Team team2 = heap.delete();
+        if (team1 != null && team2 != null) {
+            Game game = new Game(team1, team2, iceTime);
+            games.add(game);
+
+            team1.numberOfScheduledGames++;
+            team2.numberOfScheduledGames++;
+            team1.numberOfDaysSinceLastGame = 0;
+            team2.numberOfDaysSinceLastGame = 0;
+            team1.gamesPlayedAgainst.put(team2.id, team1.gamesPlayedAgainst.getOrDefault(team2.id, 0) + 1);
+            team2.gamesPlayedAgainst.put(team1.id, team2.gamesPlayedAgainst.getOrDefault(team1.id, 0) + 1);
+
+            if (iceTime.isEarly) {
+                team1.numberOfEarlyGames++;
+                team2.numberOfEarlyGames++;
+            }
+            else {
+                team1.numberOfLateGames++;
+                team2.numberOfLateGames++;
+            }
+
+            League league = heapLeagueMap.get(heap);
+
+            for (Team team : league.teams) {
+                if (team != team1 && team != team2) {
+                    team.numberOfDaysSinceLastGame++;
+                }
+            }
+        }
+        if (team1 != null && team1.numberOfScheduledGames < 10) {
+            heap.insert(team1);
+        }
+        if (team2 != null && team2.numberOfScheduledGames < 10) {
+            heap.insert(team2);
+        }
     }
 
     public static void main(String args[]) throws Exception {

@@ -1,5 +1,8 @@
 package heap.leftist_heap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class LeftistHeap<E extends Comparable<? super E>> {
 
     protected static class Node<E> {
@@ -26,6 +29,25 @@ public abstract class LeftistHeap<E extends Comparable<? super E>> {
             insert(e);
         }
 
+    }
+
+    public List<E> toList() {
+        List<E> list = new ArrayList<>();
+        LeftistHeap<E> clone = clone();
+        while (!clone.isEmpty()) {
+            list.add(clone.delete());
+        }
+        return list;
+    }
+
+    public abstract LeftistHeap<E> clone();
+
+    public void clear() {
+        root = null;
+    }
+
+    public E peek() {
+        return root.data;
     }
 
     protected abstract Node<E> merge(Node<E> heap1, Node<E> heap2);

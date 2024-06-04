@@ -11,6 +11,24 @@ public class MinLeftistHeap<E extends Comparable<? super E>> extends LeftistHeap
     }
 
     @Override
+    public LeftistHeap<E> clone() {
+        LeftistHeap<E> clone = new MinLeftistHeap<>();
+        clone(root, clone.root);
+        return clone;
+    }
+    private void clone(Node<E> node, Node<E> cloneNode) {
+        if (node == null) {
+            return;
+        }
+        cloneNode.data = node.data;
+        cloneNode.nullPathLength = node.nullPathLength;
+        cloneNode.left = new Node<>(null);
+        cloneNode.right = new Node<>(null);
+        clone(node.left, cloneNode.left);
+        clone(node.right, cloneNode.right);
+    }
+
+    @Override
     protected Node<E> merge(Node<E> heap1, Node<E> heap2) {
         if (heap1 == null) {
             return heap2;
